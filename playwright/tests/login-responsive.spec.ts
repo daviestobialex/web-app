@@ -136,11 +136,9 @@ test.describe('Login Page - Responsive Layout', () => {
     const buttonBox = await loginButton.boundingBox();
     expect(buttonBox).toBeTruthy();
 
-    // Resources section should be not be visible
+    // Resources section was removed from the login screen.
     const resourcesSection = page.locator('.resources-section');
-    const resourcesBox = await resourcesSection.boundingBox();
-    // expect(resourcesBox).toBeTruthy();
-    expect(resourcesBox).toBeFalsy();
+    await expect(resourcesSection).toHaveCount(0);
 
     // Footer should be visible
     const footer = loginPage.divLocator('.login-footer');

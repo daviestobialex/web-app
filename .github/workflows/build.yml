@@ -4,7 +4,7 @@ name: build-run
 on:
   # Triggers the workflow on push or pull request events for specific branches
   push:
-    branches: [main, dev, dev-angular-19]
+    branches: [main, dev, dev-angular-19, yente]
   pull_request:
     branches: [main, dev, dev-angular-19]
 
@@ -86,11 +86,9 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.HUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: dist/web-app/browser
-          #without preserve it only builds if you have untracked files
-          PRESERVE: true
+          token: ${{ secrets.HUB_TOKEN }}
+          branch: gh-pages
+          folder: dist/web-app/browser
           # github user name and email shows up in the logs,
           # so it would be better to make it silent.
-          SILENT: true
+          silent: true
