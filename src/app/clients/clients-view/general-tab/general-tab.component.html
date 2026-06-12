@@ -418,6 +418,32 @@
               class="account-action-button"
               mat-raised-button
               color="primary"
+              matTooltip="{{ 'labels.buttons.Transfer Funds' | translate }}"
+              matTooltipPosition="above"
+              *mifosxHasPermission="'CREATE_ACCOUNTTRANSFER'"
+              (click)="routeEdit($event); routeSavingsTransferFund(element.id)"
+            >
+              <i class="fa fa-exchange"></i>
+            </button>
+          }
+          @if (element.status.active && interbankTransfersEnabled && element.externalId) {
+            <button
+              class="account-action-button"
+              mat-raised-button
+              color="primary"
+              matTooltip="{{ 'labels.buttons.Interbank Transfer' | translate }}"
+              matTooltipPosition="above"
+              *mifosxHasPermission="'CREATE_ACCOUNTTRANSFER'"
+              (click)="routeEdit($event); routeSavingsInterbankTransfer(element.id)"
+            >
+              <i class="fa fa-random"></i>
+            </button>
+          }
+          @if (element.status.active) {
+            <button
+              class="account-action-button"
+              mat-raised-button
+              color="primary"
               (click)="routeEdit($event)"
               [routerLink]="['../', 'savings-accounts', element.id, 'actions', 'Deposit']"
             >

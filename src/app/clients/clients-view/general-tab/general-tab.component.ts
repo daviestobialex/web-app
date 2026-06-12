@@ -10,6 +10,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
 
 /** Custom Services. */
 import { ClientsService } from 'app/clients/clients.service';
@@ -83,6 +84,7 @@ import { LoanProductService } from 'app/products/loan-products/services/loan-pro
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeneralTabComponent implements OnDestroy {
+  readonly interbankTransfersEnabled = environment.mifosInterbankTransfersEnabled;
   private destroy$ = new Subject<void>();
   private alertService = inject(AlertService);
   private sanitizer = inject(DomSanitizer);
@@ -411,6 +413,34 @@ export class GeneralTabComponent implements OnDestroy {
         '../',
         'loans-accounts',
         loanId,
+        'transfer-funds',
+        'make-account-transfer'
+      ],
+      { relativeTo: this.route, queryParams: queryParams }
+    );
+  }
+
+  routeSavingsTransferFund(savingsId: any) {
+    const queryParams: any = { interbank: false, savingsId: savingsId, accountType: 'fromsavings' };
+    this.router.navigate(
+      [
+        '../',
+        'savings-accounts',
+        savingsId,
+        'transfer-funds',
+        'make-account-transfer'
+      ],
+      { relativeTo: this.route, queryParams: queryParams }
+    );
+  }
+
+  routeSavingsInterbankTransfer(savingsId: any) {
+    const queryParams: any = { interbank: true, savingsId: savingsId, accountType: 'interbank' };
+    this.router.navigate(
+      [
+        '../',
+        'savings-accounts',
+        savingsId,
         'transfer-funds',
         'make-account-transfer'
       ],
