@@ -72,6 +72,8 @@ const EXCLUDE_PATTERNS = [
   'tsconfig'
 ];
 
+const DEFAULT_SCAN_ROOT = path.resolve(__dirname, '..', 'src');
+
 /**
  * Check if a file should be excluded from header validation
  */
@@ -172,20 +174,40 @@ function formatExpectedHeader(header) {
   return '\n' + header.join('\n') + '\n';
 }
 
+function collectFiles(dirPath) {
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  const files = [];
+
+  entries.forEach((entry) => {
+    const fullPath = path.join(dirPath, entry.name);
+
+    if (shouldExclude(fullPath)) {
+      return;
+    }
+
+    if (entry.isDirectory()) {
+      files.push(...collectFiles(fullPath));
+      return;
+    }
+
+    if (getExpectedHeader(fullPath)) {
+      files.push(fullPath);
+    }
+  });
+
+  return files;
+}
+
 /**
  * Main function
  */
 function main() {
   const args = process.argv.slice(2);
-
-  if (args.length === 0) {
-    console.error('Usage: node check-file-headers.js <file1> <file2> ...');
-    process.exit(1);
-  }
+  const files = args.length > 0 ? args : collectFiles(DEFAULT_SCAN_ROOT);
 
   const filesWithoutHeaders = [];
 
-  args.forEach((filePath) => {
+  files.forEach((filePath) => {
     if (!fs.existsSync(filePath)) {
       console.error(`File not found: ${filePath}`);
       return;
@@ -214,7 +236,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log('✅ All files have valid headers');
+  console.log(`✅ All files have valid headers (${files.length} checked)`);
   process.exit(0);
 }
 
