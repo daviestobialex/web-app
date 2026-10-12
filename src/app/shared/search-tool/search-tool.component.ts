@@ -69,26 +69,9 @@ export class SearchToolComponent {
 
   /** Query Form Control */
   query = new UntypedFormControl('');
-  /** Resource Form Control */
-  resource = new UntypedFormControl('');
 
   /** Controls modal visibility */
   searchVisible = false;
-
-  /** Resource Options */
-  resourceOptions: any[] = [
-    { name: 'All', value: 'clients,clientIdentifiers,groups,savings,shares,loans' },
-    { name: 'Clients', value: 'clients,clientIdentifiers' },
-    { name: 'Groups', value: 'groups' },
-    { name: 'Savings', value: 'savings' },
-    { name: 'Shares', value: 'shares' },
-    { name: 'Loans', value: 'loans' }
-  ];
-
-  constructor() {
-    this.resource.patchValue('clients,clientIdentifiers,groups,savings,shares,loans');
-    this.query.patchValue('');
-  }
 
   /** Close modal on Escape key anywhere in the document. */
   @HostListener('document:keydown.escape')
@@ -114,12 +97,9 @@ export class SearchToolComponent {
     this.cdr.markForCheck();
   }
 
-  /** Executes search and closes the modal. */
+  /** Executes search and closes the modal. Scope refinement lives on the results page. */
   search(): void {
-    const queryParams: any = {
-      query: this.query.value,
-      resource: this.resource.value
-    };
+    const queryParams: any = { query: this.query.value };
     this.closeModal();
     this.router.navigate(['/search'], { queryParams });
   }

@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -55,6 +56,7 @@ export class FamilyMembersTabComponent {
   private route = inject(ActivatedRoute);
   private clientsService = inject(ClientsService);
   dialog = inject(MatDialog);
+  private destroyRef = inject(DestroyRef);
 
   /** Client Family Members */
   clientFamilyMembers: any;
@@ -65,7 +67,7 @@ export class FamilyMembersTabComponent {
    * @param {MatDialog }dialog Mat Dialog
    */
   constructor() {
-    this.route.data.subscribe((data: { clientFamilyMembers: any }) => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: { clientFamilyMembers: any }) => {
       this.clientFamilyMembers = data.clientFamilyMembers;
     });
   }
@@ -78,7 +80,7 @@ export class FamilyMembersTabComponent {
       data: { deleteContext: `Family member id:${id} name : ${name} ${index}` }
     });
     deleteFamilyMemberDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
+      if (response?.delete) {
         this.clientsService.deleteFamilyMember(clientId, id).subscribe(() => {
           this.clientFamilyMembers.splice(index, 1);
         });

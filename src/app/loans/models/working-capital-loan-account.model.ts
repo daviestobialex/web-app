@@ -13,5 +13,20 @@ export interface PeriodPaymentRateChange {
   previousRate: number;
   newRate: number;
   reversed: boolean;
-  createdDate: number[];
+  submittedOnDate: number[];
+}
+
+export interface BreachSchedule {
+  id: number;
+  loanId: number;
+  periodNumber: number;
+  fromDate: Date;
+  toDate: Date;
+  numberOfDays: number;
+  minPaymentAmount: number;
+  outstandingAmount: number;
+  nearBreach?: boolean;
+  breach?: boolean;
+  /** True when the evaluation period was flagged by a breach reset action */
+  reset?: boolean;
 }

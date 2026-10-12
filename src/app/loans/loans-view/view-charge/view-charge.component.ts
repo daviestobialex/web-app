@@ -7,7 +7,8 @@
  */
 
 /** Angular Imports */
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -50,6 +51,7 @@ import { LoanAccountTabBaseComponent } from '../loan-account-tab-base.component'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewChargeComponent extends LoanAccountTabBaseComponent {
+  private readonly destroyRef = inject(DestroyRef);
   private loansService = inject(LoansService);
   private route = inject(ActivatedRoute);
   private dateUtils = inject(Dates);
@@ -75,12 +77,15 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
    */
   constructor() {
     super();
-    this.route.data.subscribe((data: { loansAccountCharge: any; loanDetailsData: any }) => {
-      this.chargeData = data.loansAccountCharge;
-      this.allowPayCharge = this.chargeData.chargePayable && !this.chargeData.paid;
-      this.allowWaive = !this.chargeData.chargeTimeType.waived;
-      this.loansAccountData = data.loanDetailsData;
-    });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: { loansAccountCharge: any; loanDetailsData: any }) => {
+        this.chargeData = data.loansAccountCharge;
+        this.allowPayCharge = this.chargeData.chargePayable && !this.chargeData.paid;
+        // Working Capital loans do not support the waive charge command.
+        this.allowWaive = !this.chargeData.chargeTimeType.waived && !this.loanProductService.isWorkingCapital;
+        this.loansAccountData = data.loanDetailsData;
+      });
   }
 
   /**
@@ -103,7 +108,7 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
     };
     const payChargeDialogRef = this.dialog.open(FormDialogComponent, { data });
     payChargeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.data) {
+      if (response?.data) {
         const locale = this.settingsService.language.code;
         const dateFormat = this.settingsService.dateFormat;
         const prevTransactionDate: Date = response.data.value.transactionDate;
@@ -113,7 +118,13 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
           locale
         };
         this.loansService
-          .executeLoansAccountChargesCommand(this.chargeData.loanId, 'pay', dataObject, this.chargeData.id)
+          .executeLoansAccountChargesCommand(
+            this.loanProductService.loanAccountPath,
+            this.chargeData.loanId,
+            'pay',
+            dataObject,
+            this.chargeData.id
+          )
           .subscribe(() => {
             this.reload();
           });
@@ -135,9 +146,15 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
       }
     });
     waiveChargeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.confirm) {
+      if (response?.confirm) {
         this.loansService
-          .executeLoansAccountChargesCommand(this.chargeData.loanId, 'waive', {}, this.chargeData.id)
+          .executeLoansAccountChargesCommand(
+            this.loanProductService.loanAccountPath,
+            this.chargeData.loanId,
+            'waive',
+            {},
+            this.chargeData.id
+          )
           .subscribe(() => {
             this.reload();
           });
@@ -160,7 +177,7 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
       new DatepickerBase({
         controlName: 'dueDate',
         label: 'Due Date',
-        value: new Date(this.chargeData.dueDate),
+        value: this.dateUtils.parseDate(this.chargeData.dueDate),
         type: 'date',
         maxDate: this.settingsService.maxAllowedDate,
         required: true
@@ -173,7 +190,7 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
     };
     const editChargeDialogRef = this.dialog.open(FormDialogComponent, { data });
     editChargeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.data) {
+      if (response?.data) {
         const locale = this.settingsService.language.code;
         const dateFormat = this.settingsService.dateFormat;
         const dueDate = this.dateUtils.formatDate(response.data.value.dueDate, dateFormat);
@@ -185,7 +202,12 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
           locale
         };
         this.loansService
-          .editLoansAccountCharge(this.loansAccountData.id, dataObject, this.chargeData.id)
+          .editLoansAccountCharge(
+            this.loanProductService.loanAccountPath,
+            this.loansAccountData.id,
+            dataObject,
+            this.chargeData.id
+          )
           .subscribe(() => {
             this.reload();
           });
@@ -201,10 +223,16 @@ export class ViewChargeComponent extends LoanAccountTabBaseComponent {
       data: { deleteContext: `charge id:${this.chargeData.id}` }
     });
     deleteChargeDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.delete) {
-        this.loansService.deleteLoansAccountCharge(this.loansAccountData.id, this.chargeData.id).subscribe(() => {
-          this.reload();
-        });
+      if (response?.delete) {
+        this.loansService
+          .deleteLoansAccountCharge(
+            this.loanProductService.loanAccountPath,
+            this.loansAccountData.id,
+            this.chargeData.id
+          )
+          .subscribe(() => {
+            this.reload();
+          });
       }
     });
   }

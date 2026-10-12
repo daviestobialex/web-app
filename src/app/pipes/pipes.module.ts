@@ -11,7 +11,9 @@ import { NgModule } from '@angular/core';
 import { AccountsFilterPipe } from './accounts-filter.pipe';
 import { ChargesFilterPipe } from './charges-filter.pipe';
 import { ChargesPenaltyFilterPipe } from './charges-penalty-filter.pipe';
+import { CurrencyNamePipe } from './currency-name.pipe';
 import { DateFormatPipe } from './date-format.pipe';
+import { DatatableDisplayLabelPipe } from './datatable-display-label.pipe';
 import { DatetimeFormatPipe } from './datetime-format.pipe';
 import { ExternalIdentifierPipe } from './external-identifier.pipe';
 import { FindPipe } from './find.pipe';
@@ -30,9 +32,11 @@ import { YesnoPipe } from './yesno.pipe';
     AccountsFilterPipe,
     ChargesFilterPipe,
     ChargesPenaltyFilterPipe,
+    CurrencyNamePipe,
     FindPipe,
     UrlToStringPipe,
     DateFormatPipe,
+    DatatableDisplayLabelPipe,
     DatetimeFormatPipe,
     ExternalIdentifierPipe,
     FormatNumberPipe,
@@ -46,9 +50,11 @@ import { YesnoPipe } from './yesno.pipe';
     AccountsFilterPipe,
     ChargesFilterPipe,
     ChargesPenaltyFilterPipe,
+    CurrencyNamePipe,
     FindPipe,
     UrlToStringPipe,
     DateFormatPipe,
+    DatatableDisplayLabelPipe,
     DatetimeFormatPipe,
     ExternalIdentifierPipe,
     FormatNumberPipe,
@@ -63,9 +69,11 @@ import { YesnoPipe } from './yesno.pipe';
     AccountsFilterPipe,
     ChargesFilterPipe,
     ChargesPenaltyFilterPipe,
+    CurrencyNamePipe,
     FindPipe,
     UrlToStringPipe,
     DateFormatPipe,
+    DatatableDisplayLabelPipe,
     DatetimeFormatPipe,
     ExternalIdentifierPipe,
     FormatNumberPipe,
