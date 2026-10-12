@@ -43,6 +43,7 @@ import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 import { formatTabLabel } from 'app/shared/utils/format-tab-label.util';
 import { AccountHeaderComponent } from 'app/shared/account-header/account-header.component';
+import { ClientScreeningComponent } from './client-screening/client-screening.component';
 
 @Component({
   selector: 'mifosx-clients-view',
@@ -68,7 +69,8 @@ import { AccountHeaderComponent } from 'app/shared/account-header/account-header
     MatTabNavPanel,
     RouterOutlet,
     DateFormatPipe,
-    StatusLookupPipe
+    StatusLookupPipe,
+    ClientScreeningComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
